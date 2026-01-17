@@ -14,9 +14,9 @@ public class VotacaoCacheService {
         this.redisTemplate = redisTemplate;
     }
 
-    public void sinalizarSessaoAberta(Long pautaId, int minutos) {
+    public void sinalizarSessaoAberta(Long pautaId, Long sessaoId, int minutos) {
         String chave = gerarChavePauta(pautaId);
-        redisTemplate.opsForValue().set(chave, "true", minutos, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(chave, sessaoId.toString(), minutos, TimeUnit.MINUTES);
     }
 
     public boolean isSessaoAberta(Long pautaId) {

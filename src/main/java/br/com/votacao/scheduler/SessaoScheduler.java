@@ -1,9 +1,8 @@
 package br.com.votacao.scheduler;
 
-import br.com.votacao.domain.entity.Pauta;
 import br.com.votacao.domain.entity.SessaoVotacao;
 import br.com.votacao.domain.enums.TipoVoto;
-import br.com.votacao.message.ResultadoProducer;
+import br.com.votacao.message.producer.ResultadoProducer;
 import br.com.votacao.repository.PautaRepository;
 import br.com.votacao.repository.SessaoVotacaoRepository;
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ public class SessaoScheduler {
         this.resultadoProducer = resultadoProducer;
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 30000)
     public void verificarSessoesFinalizadas() {
         log.info("Iniciando consulta das sessões expiradas.");
 
