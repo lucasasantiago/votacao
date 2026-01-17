@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: votacao
+  datasource:
+    url: jdbc:postgresql://localhost:5432/votacao
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    open-in-view: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
