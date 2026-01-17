@@ -3,6 +3,7 @@ package br.com.votacao.controller;
 import br.com.votacao.domain.enums.TipoVoto;
 import br.com.votacao.dto.request.VotoRequest;
 import br.com.votacao.dto.response.ResultadoVotacaoResponse;
+import br.com.votacao.dto.response.VotoResponse;
 import br.com.votacao.exception.BusinessException;
 import br.com.votacao.service.VotoService;
 import jakarta.validation.Valid;
@@ -10,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/votos")
@@ -23,7 +26,7 @@ public class VotoController {
     }
 
     @PostMapping("/{pautaId}")
-    public ResponseEntity<Void> votar(
+    public ResponseEntity<VotoResponse> votar(
             @PathVariable Long pautaId,
             @RequestBody @Valid VotoRequest request) {
         log.info("Recebida requisição para votar. VotoRequest={}", request);
@@ -34,9 +37,13 @@ public class VotoController {
         } catch (IllegalArgumentException ex) {
             throw new BusinessException("Voto inválido. Utilize SIM ou NAO.");
         }
-
         votoService.votar(pautaId, request.getAssociadoId(), tipoVoto);
-        return ResponseEntity.ok().build();
+        VotoResponse response = new VotoResponse(
+                "Voto recebido com sucesso e enviado para processamento.",
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.accepted().body(response);
     }
 
     @GetMapping("/pauta/{pautaId}/resultado")

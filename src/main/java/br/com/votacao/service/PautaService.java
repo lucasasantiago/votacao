@@ -57,9 +57,9 @@ public class PautaService {
         sessao.setInicio(LocalDateTime.now());
         sessao.setFim(LocalDateTime.now().plusMinutes(duracaoMinutos));
 
-        sessaoRepository.save(sessao);
+        SessaoVotacao sessaoSalva = sessaoRepository.save(sessao);
         log.info("Sessão criada com sucesso para pautaId={}", pautaId);
 
-        cacheService.sinalizarSessaoAberta(pautaId, duracaoMinutos);
+        cacheService.sinalizarSessaoAberta(pautaId, sessaoSalva.getId(), duracaoMinutos);
     }
 }

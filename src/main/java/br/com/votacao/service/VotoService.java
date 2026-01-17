@@ -1,15 +1,10 @@
 package br.com.votacao.service;
 
-import br.com.votacao.domain.entity.Pauta;
-import br.com.votacao.domain.entity.SessaoVotacao;
-import br.com.votacao.domain.entity.Voto;
 import br.com.votacao.domain.enums.TipoVoto;
 import br.com.votacao.dto.response.ResultadoVotacaoResponse;
 import br.com.votacao.exception.BusinessException;
 import br.com.votacao.message.VotoMessage;
-import br.com.votacao.message.VotoProducer;
-import br.com.votacao.repository.PautaRepository;
-import br.com.votacao.repository.SessaoVotacaoRepository;
+import br.com.votacao.message.producer.VotoProducer;
 import br.com.votacao.repository.VotoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,18 +14,12 @@ import org.springframework.stereotype.Service;
 public class VotoService {
 
     private final VotoRepository votoRepository;
-    private final SessaoVotacaoRepository sessaoRepository;
-    private final PautaRepository pautaRepository;
     private final VotacaoCacheService cacheService;
     private final VotoProducer votoProducer;
     private static final Logger log = LoggerFactory.getLogger(VotoService.class);
 
-    public VotoService(VotoRepository votoRepository,
-                       SessaoVotacaoRepository sessaoRepository,
-                       PautaRepository pautaRepository, VotacaoCacheService cacheService, VotoProducer votoProducer) {
+    public VotoService(VotoRepository votoRepository, VotacaoCacheService cacheService, VotoProducer votoProducer) {
         this.votoRepository = votoRepository;
-        this.sessaoRepository = sessaoRepository;
-        this.pautaRepository = pautaRepository;
         this.cacheService = cacheService;
         this.votoProducer = votoProducer;
     }
@@ -51,16 +40,8 @@ public class VotoService {
         }
 
         cacheService.registrarVotoNoCache(pautaId, associadoId);
-        votoProducer.enviarVoto(new VotoMessage(pautaId, associadoId, voto));
+        votoProducer.enviarVoto(new VotoMessage(pautaId, sessaoId, associadoId, voto));
 
-        Pauta pauta = pautaRepository.getReferenceById(pautaId);
-
-        Voto novoVoto = new Voto();
-        novoVoto.setAssociadoId(associadoId);
-        novoVoto.setPauta(pauta);
-        novoVoto.setVoto(voto);
-
-        votoRepository.save(novoVoto);
         log.info("O voto do associado foi registrado com sucesso. pautaId={}, associadoId={}, voto={}", pautaId, associadoId, voto);
     }
 

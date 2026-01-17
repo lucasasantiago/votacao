@@ -1,6 +1,7 @@
-package br.com.votacao.message;
+package br.com.votacao.message.consumer;
 
 import br.com.votacao.configuration.RabbitMQConfig;
+import br.com.votacao.message.ResultadoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

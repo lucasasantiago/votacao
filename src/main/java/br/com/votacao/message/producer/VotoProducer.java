@@ -1,5 +1,6 @@
-package br.com.votacao.message;
+package br.com.votacao.message.producer;
 
+import br.com.votacao.message.VotoMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
