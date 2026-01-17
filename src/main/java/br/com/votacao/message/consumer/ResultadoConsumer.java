@@ -15,7 +15,9 @@ public class ResultadoConsumer {
     @RabbitListener(queues = RabbitMQConfig.FILA_RESULTADO_VOTACAO)
     public void receberResultado(ResultadoMessage mensagem) {
         log.info("### MENSAGEM RECEBIDA DA FILA ###");
-        log.info("Pauta ID: {}", mensagem.getPautaId());
-        log.info("Resultado: {}", mensagem.getResultado());
+        log.info("Pauta ID: {}", mensagem.pautaId());
+        log.info("Votos Sim: {}", mensagem.votosSim());
+        log.info("Votos Não: {}", mensagem.votosNao());
+        log.info("Resultado: {}", mensagem.resultadoVotacao());
     }
 }

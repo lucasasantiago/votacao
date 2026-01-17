@@ -1,10 +1,12 @@
 package br.com.votacao.scheduler;
 
 import br.com.votacao.domain.entity.SessaoVotacao;
-import br.com.votacao.domain.enums.TipoVoto;
+import br.com.votacao.dto.VotoContagem;
+import br.com.votacao.message.ResultadoMessage;
 import br.com.votacao.message.producer.ResultadoProducer;
 import br.com.votacao.repository.PautaRepository;
 import br.com.votacao.repository.SessaoVotacaoRepository;
+import br.com.votacao.util.VotacaoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,36 +36,21 @@ public class SessaoScheduler {
         List<SessaoVotacao> sessoesEncerradas = sessaoVotacaoRepository.buscarSessoesExpiradas(LocalDateTime.now());
 
         sessoesEncerradas.forEach(sessaoVotacao -> {
-            String resultado = calcularResultado(sessaoVotacao);
-
-            resultadoProducer.enviarResultado(sessaoVotacao.getId(), resultado);
+            resultadoProducer.enviarResultado(buildResultadoMessage(sessaoVotacao));
 
             sessaoVotacao.setProcessada(Boolean.TRUE);
             sessaoVotacaoRepository.save(sessaoVotacao);
         });
     }
 
-    private String calcularResultado(SessaoVotacao sessaoVotacao) {
-        List<Object[]> contagemVotos = pautaRepository.contarVotosAgrupados(sessaoVotacao.getId());
+    private ResultadoMessage buildResultadoMessage(SessaoVotacao sessaoVotacao) {
+        VotoContagem contagemVotos = pautaRepository.votosContagem(sessaoVotacao.getPauta().getId());
 
-        long sim = 0;
-        long nao = 0;
+        log.info("Resultado calculado para a Sessão {}: Sim={}, Não={}", sessaoVotacao.getId(), contagemVotos.votosSim(), contagemVotos.votosNao());
 
-        for (Object[] registro : contagemVotos) {
-            String tipoVoto = registro[0].toString();
-            long total = (long) registro[1];
-
-            if (TipoVoto.SIM.name().equalsIgnoreCase(tipoVoto)) {
-                sim = total;
-            } else if (TipoVoto.NAO.name().equalsIgnoreCase(tipoVoto)) {
-                nao = total;
-            }
-        }
-
-        log.info("Resultado calculado para a Sessão {}: SIM={}, NAO={}", sessaoVotacao.getId(), sim, nao);
-
-        if (sim > nao) return "APROVADA";
-        if (nao > sim) return "REPROVADA";
-        return "EMPATE";
+        return new ResultadoMessage(sessaoVotacao.getPauta().getId(),
+                                    contagemVotos.votosSim(),
+                                    contagemVotos.votosNao(),
+                                    VotacaoUtils.calcularResultado(contagemVotos.votosSim(), contagemVotos.votosNao()).name());
     }
 }

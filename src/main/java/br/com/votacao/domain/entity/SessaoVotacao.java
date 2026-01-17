@@ -1,5 +1,6 @@
 package br.com.votacao.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class SessaoVotacao {
 
     @OneToOne
     @JoinColumn(name = "pauta_id", nullable = false, unique = true)
+    @JsonIgnoreProperties("pauta")
     private Pauta pauta;
 
     @Column(nullable = false)

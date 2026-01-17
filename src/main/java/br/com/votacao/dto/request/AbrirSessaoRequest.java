@@ -11,4 +11,11 @@ public class AbrirSessaoRequest {
     public void setDuracaoEmMinutos(Integer duracaoEmMinutos) {
         this.duracaoEmMinutos = duracaoEmMinutos;
     }
+
+    @Override
+    public String toString() {
+        return "AbrirSessaoRequest{" +
+                "duracaoEmMinutos=" + duracaoEmMinutos +
+                '}';
+    }
 }

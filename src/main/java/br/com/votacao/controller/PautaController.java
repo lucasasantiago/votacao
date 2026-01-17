@@ -2,6 +2,8 @@ package br.com.votacao.controller;
 
 import br.com.votacao.dto.request.AbrirSessaoRequest;
 import br.com.votacao.dto.request.CriarPautaRequest;
+import br.com.votacao.dto.response.PautaResponse;
+import br.com.votacao.dto.response.SessaoVotacaoResponse;
 import br.com.votacao.service.PautaService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -11,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/pautas")
+@RequestMapping("/v1/pautas")
 public class PautaController {
 
     private final PautaService pautaService;
@@ -23,22 +25,21 @@ public class PautaController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> criarPauta(@RequestBody @Valid CriarPautaRequest request) {
+    public ResponseEntity<PautaResponse> criarPauta(@RequestBody @Valid CriarPautaRequest request) {
         log.info("Recebida requisição para criar pauta. Título={}", request.getTitulo());
-        pautaService.criarPauta(request.getTitulo());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(pautaService.criarPauta(request.getTitulo()));
     }
 
     @PostMapping("/{pautaId}/sessao")
-    public ResponseEntity<Void> abrirSessao(
+    public ResponseEntity<SessaoVotacaoResponse> abrirSessao(
             @PathVariable Long pautaId,
             @RequestBody(required = false) AbrirSessaoRequest request) {
 
         log.info("Recebida requisição para abrir a sessão. AbrirSessaoRequest={}", request);
 
         Integer duracao = request != null ? request.getDuracaoEmMinutos() : null;
-        pautaService.abrirSessao(pautaId, duracao);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(pautaService.abrirSessao(pautaId, duracao));
     }
 }

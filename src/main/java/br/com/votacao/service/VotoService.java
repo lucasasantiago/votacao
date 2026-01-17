@@ -1,11 +1,12 @@
 package br.com.votacao.service;
 
 import br.com.votacao.domain.enums.TipoVoto;
+import br.com.votacao.dto.VotoContagem;
 import br.com.votacao.dto.response.ResultadoVotacaoResponse;
 import br.com.votacao.exception.BusinessException;
 import br.com.votacao.message.VotoMessage;
 import br.com.votacao.message.producer.VotoProducer;
-import br.com.votacao.repository.VotoRepository;
+import br.com.votacao.util.VotacaoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,15 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class VotoService {
 
-    private final VotoRepository votoRepository;
     private final VotacaoCacheService cacheService;
     private final VotoProducer votoProducer;
+    private final PautaService pautaService;
     private static final Logger log = LoggerFactory.getLogger(VotoService.class);
 
-    public VotoService(VotoRepository votoRepository, VotacaoCacheService cacheService, VotoProducer votoProducer) {
-        this.votoRepository = votoRepository;
+    public VotoService(VotacaoCacheService cacheService, VotoProducer votoProducer, PautaService pautaService) {
         this.cacheService = cacheService;
         this.votoProducer = votoProducer;
+        this.pautaService = pautaService;
     }
 
     public void votar(Long pautaId, String associadoId, TipoVoto voto) {
@@ -48,8 +49,8 @@ public class VotoService {
     public ResultadoVotacaoResponse resultado(Long pautaId) {
         log.info("Obtendo o resultado da votação. pautaId={}", pautaId);
 
-        long sim = votoRepository.countByPautaIdAndVoto(pautaId, TipoVoto.SIM);
-        long nao = votoRepository.countByPautaIdAndVoto(pautaId, TipoVoto.NAO);
-        return new ResultadoVotacaoResponse(sim, nao);
+        VotoContagem votosContagem = pautaService.votosContagem(pautaId);
+        return new ResultadoVotacaoResponse(pautaId, votosContagem.votosSim(), votosContagem.votosNao(),
+                VotacaoUtils.calcularResultado(votosContagem.votosSim(), votosContagem.votosNao()));
     }
 }
