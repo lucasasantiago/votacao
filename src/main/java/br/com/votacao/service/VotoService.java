@@ -6,6 +6,7 @@ import br.com.votacao.domain.entity.Voto;
 import br.com.votacao.domain.enums.TipoVoto;
 import br.com.votacao.dto.response.ResultadoVotacaoResponse;
 import br.com.votacao.exception.BusinessException;
+import br.com.votacao.message.VotoMessage;
 import br.com.votacao.message.VotoProducer;
 import br.com.votacao.repository.PautaRepository;
 import br.com.votacao.repository.SessaoVotacaoRepository;
@@ -50,7 +51,7 @@ public class VotoService {
         }
 
         cacheService.registrarVotoNoCache(pautaId, associadoId);
-        votoProducer.enviarVoto(new VotoMensagem(pautaId, sessaoId, associadoId, voto));
+        votoProducer.enviarVoto(new VotoMessage(pautaId, associadoId, voto));
 
         Pauta pauta = pautaRepository.getReferenceById(pautaId);
 
