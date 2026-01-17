@@ -427,7 +427,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/v1/votos/pauta/{{pautaId}}/resultado",
+          "raw": "http://localhost:8080/v1/votos/pautas/{{pautaId}}/resultado",
           "protocol": "http",
           "host": [
             "localhost"
@@ -436,7 +436,7 @@
           "path": [
             "v1",
             "votos",
-            "pauta",
+            "pautas",
             "{{pautaId}}",
             "resultado"
           ]

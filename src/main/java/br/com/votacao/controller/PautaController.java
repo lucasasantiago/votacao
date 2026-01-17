@@ -37,9 +37,7 @@ public class PautaController {
 
         log.info("Recebida requisição para abrir a sessão. AbrirSessaoRequest={}", request);
 
-        Integer duracao = request != null ? request.getDuracaoEmMinutos() : null;
-
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(pautaService.abrirSessao(pautaId, duracao));
+                .body(pautaService.abrirSessao(pautaId, request));
     }
 }

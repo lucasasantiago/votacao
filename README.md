@@ -14,7 +14,7 @@ A aplicação permite:
 ## Decisões de Projeto e Arquitetura
 
 - **Tecnologias**: Utilizado **Spring Boot 3 + Java 17**.
-- **Arquitetura**: Camadas bem definidas (Controller, Service, Repository) com foco em **Clean Code**.
+- **Arquitetura**: Camadas com foco em **Clean Code** (Controller, Service, Repository).
 - **Arquitetura Orientada a Eventos**: O registro de votos e a notificação de resultados são feitos de forma assíncrona via RabbitMQ, garantindo que picos de tráfego não afetem a disponibilidade da API.
 - **Alta Disponibilidade (Redis)**: Utilizado para controle de idempotência e validação rápida de sessões de votação, reduzindo o I/O no banco de dados principal.
 - **Automação (Scheduler)**: Implementado SessaoScheduler para monitorar e encerrar sessões expiradas automaticamente, calculando o resultado e notificando via mensageria.
@@ -25,7 +25,7 @@ A aplicação permite:
   - **Encerramento Automático**: O processamento e a divulgação do resultado ocorrem de forma automática após o fim da sessão.
 - **Lombok Abstraído**: Opção por código explícito para facilitar a avaliação técnica e manter o projeto leve.
 - **Observabilidade**: Inclusão do **Spring Actuator** para monitoramento de saúde do sistema, seguindo padrões de ambientes Cloud.
-
+- **Testes**: JUnit 5, Mockito e JaCoCo
 ---
 ## Tarefas Bônus
 
@@ -59,6 +59,19 @@ mvn spring-boot:run
 ### Informações Úteis
 - URL Base: http://localhost:8080
 - Health Check (Actuator): http://localhost:8080/actuator/health
+
+---
+
+## Qualidade e Testes
+
+O projeto utiliza **JUnit 5** e **Mockito** para garantir a integridade da lógica de negócio.
+A cobertura de testes é monitorada pelo **JaCoCo**.
+
+### Cobertura Atual: 93%
+
+![Relatório de Cobertura JaCoCo](docs/images/jacoco-report.png)
+
+> **Nota:** Classes de DTOs, Entidades e Mappers foram excluídas da contagem para focar na cobertura da lógica de negócio.
 
 ---
 ## Relatório de Performance (Teste de Carga)

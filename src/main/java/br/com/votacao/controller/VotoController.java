@@ -37,7 +37,7 @@ public class VotoController {
         return ResponseEntity.accepted().body(response);
     }
 
-    @GetMapping("/pauta/{pautaId}/resultado")
+    @GetMapping("/pautas/{pautaId}/resultado")
     public ResponseEntity<ResultadoVotacaoResponse> resultado(@PathVariable Long pautaId) {
         log.info("Recebida requisição para obter o resultado para a pautaId={}", pautaId);
 

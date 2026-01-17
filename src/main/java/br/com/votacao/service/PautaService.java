@@ -3,13 +3,13 @@ package br.com.votacao.service;
 import br.com.votacao.domain.entity.Pauta;
 import br.com.votacao.domain.entity.SessaoVotacao;
 import br.com.votacao.dto.VotoContagem;
+import br.com.votacao.dto.request.AbrirSessaoRequest;
 import br.com.votacao.dto.response.PautaResponse;
 import br.com.votacao.dto.response.SessaoVotacaoResponse;
 import br.com.votacao.exception.BusinessException;
 import br.com.votacao.mapper.PautaMapper;
 import br.com.votacao.mapper.SessaoVotacaoMapper;
 import br.com.votacao.repository.PautaRepository;
-import br.com.votacao.repository.SessaoVotacaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class PautaService {
         return pautaMapper.toResponse(pautaSalva);
     }
 
-    public SessaoVotacaoResponse abrirSessao(Long pautaId, Integer minutos) {
+    public SessaoVotacaoResponse abrirSessao(Long pautaId, AbrirSessaoRequest abrirSessaoRequest) {
         log.info("Abrindo sessão de votação para pautaId={}", pautaId);
 
         Pauta pauta = pautaRepository.findPautaComSessaoAtiva(pautaId, LocalDateTime.now())
@@ -58,7 +58,7 @@ public class PautaService {
             throw new BusinessException("Sessão já aberta");
         }
 
-        int duracaoMinutos = minutos != null ? minutos : 1;
+        int duracaoMinutos = abrirSessaoRequest != null ? abrirSessaoRequest.getDuracaoEmMinutos() : 1;
         log.info("Sessão será aberta por {} minuto(s)", duracaoMinutos);
 
         SessaoVotacao sessao = new SessaoVotacao();

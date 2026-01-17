@@ -38,7 +38,7 @@ class VotoControllerTest {
     void deveRegistrarVotoSimComSucesso() throws Exception {
         VotoRequest request = new VotoRequest("assoc-1", TipoVoto.SIM.getDescricao());
 
-        mockMvc.perform(post("/v1/votos/1")
+        mockMvc.perform(post("/v1/votos/pautas/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isAccepted());
@@ -51,7 +51,7 @@ class VotoControllerTest {
     void deveRetornarErroVotoInvalido() throws Exception {
         VotoRequest request = new VotoRequest("assoc-1", "TALVEZ");
 
-        mockMvc.perform(post("/v1/votos/1")
+        mockMvc.perform(post("/v1/votos/pautas/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -67,7 +67,7 @@ class VotoControllerTest {
         doThrow(new BusinessException("Sessão encerrada para esta pauta."))
                 .when(votoService).votar(anyLong(), anyString(), any(TipoVoto.class));
 
-        mockMvc.perform(post("/v1/votos/1")
+        mockMvc.perform(post("/v1/votos/pautas/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -78,7 +78,7 @@ class VotoControllerTest {
     void deveRetornarErroValidacaoCampos() throws Exception {
         VotoRequest request = new VotoRequest(null, TipoVoto.SIM.getDescricao());
 
-        mockMvc.perform(post("/v1/votos/1")
+        mockMvc.perform(post("/v1/votos/pautas/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -91,7 +91,7 @@ class VotoControllerTest {
 
         when(votoService.resultado(1L)).thenReturn(response);
 
-        mockMvc.perform(get("/v1/votos/pauta/1/resultado"))
+        mockMvc.perform(get("/v1/votos/pautas/1/resultado"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pautaId").value(1))
                 .andExpect(jsonPath("$.votosSim").value(10))
@@ -104,7 +104,7 @@ class VotoControllerTest {
     void deveAceitarNaoComAcento() throws Exception {
         VotoRequest request = new VotoRequest("assoc-1", TipoVoto.NAO.getDescricao());
 
-        mockMvc.perform(post("/v1/votos/1")
+        mockMvc.perform(post("/v1/votos/pautas/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isAccepted());
