@@ -17,13 +17,8 @@ public class ResultadoProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void enviarResultado(Long pautaId, String resultado) {
-        log.info("Enviando resultado para a fila {}. pautaId={}, resultado={}", RabbitMQConfig.FILA_RESULTADO_VOTACAO, pautaId, resultado);
-
-        ResultadoMessage mensagem = new ResultadoMessage.Builder()
-                                            .pautaId(pautaId)
-                                            .resultado(resultado)
-                                            .build();
+    public void enviarResultado(ResultadoMessage mensagem) {
+        log.info("Enviando resultado para a fila {}. mensagem={}", RabbitMQConfig.FILA_RESULTADO_VOTACAO, mensagem);
 
         rabbitTemplate.convertAndSend(RabbitMQConfig.FILA_RESULTADO_VOTACAO, mensagem);
     }

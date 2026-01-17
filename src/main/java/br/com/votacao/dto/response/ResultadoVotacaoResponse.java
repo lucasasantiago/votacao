@@ -1,20 +1,5 @@
 package br.com.votacao.dto.response;
 
-public class ResultadoVotacaoResponse {
+import br.com.votacao.domain.enums.ResultadoVotacao;
 
-    private long votosSim;
-    private long votosNao;
-
-    public ResultadoVotacaoResponse(long votosSim, long votosNao) {
-        this.votosSim = votosSim;
-        this.votosNao = votosNao;
-    }
-
-    public long getVotosSim() {
-        return votosSim;
-    }
-
-    public long getVotosNao() {
-        return votosNao;
-    }
-}
+public record ResultadoVotacaoResponse (long pautaId, long votosSim, long votosNao, ResultadoVotacao resultadoVotacao){}

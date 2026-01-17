@@ -4,7 +4,6 @@ import br.com.votacao.domain.enums.TipoVoto;
 import br.com.votacao.dto.request.VotoRequest;
 import br.com.votacao.dto.response.ResultadoVotacaoResponse;
 import br.com.votacao.dto.response.VotoResponse;
-import br.com.votacao.exception.BusinessException;
 import br.com.votacao.service.VotoService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/votos")
+@RequestMapping("/v1/votos")
 public class VotoController {
 
     private final VotoService votoService;
@@ -25,28 +24,20 @@ public class VotoController {
         this.votoService = votoService;
     }
 
-    @PostMapping("/{pautaId}")
+    @PostMapping("/pautas/{pautaId}")
     public ResponseEntity<VotoResponse> votar(
             @PathVariable Long pautaId,
             @RequestBody @Valid VotoRequest request) {
         log.info("Recebida requisição para votar. VotoRequest={}", request);
 
-        TipoVoto tipoVoto;
-        try {
-            tipoVoto = TipoVoto.valueOf(request.getVoto().toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException("Voto inválido. Utilize SIM ou NAO.");
-        }
+        TipoVoto tipoVoto = TipoVoto.buscarPorDescricao(request.getVoto());
         votoService.votar(pautaId, request.getAssociadoId(), tipoVoto);
-        VotoResponse response = new VotoResponse(
-                "Voto recebido com sucesso e enviado para processamento.",
-                LocalDateTime.now()
-        );
+        VotoResponse response = new VotoResponse("Voto recebido com sucesso e enviado para processamento.", LocalDateTime.now());
 
         return ResponseEntity.accepted().body(response);
     }
 
-    @GetMapping("/pauta/{pautaId}/resultado")
+    @GetMapping("/pautas/{pautaId}/resultado")
     public ResponseEntity<ResultadoVotacaoResponse> resultado(@PathVariable Long pautaId) {
         log.info("Recebida requisição para obter o resultado para a pautaId={}", pautaId);
 

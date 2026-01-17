@@ -2,9 +2,14 @@ package br.com.votacao.service;
 
 import br.com.votacao.domain.entity.Pauta;
 import br.com.votacao.domain.entity.SessaoVotacao;
+import br.com.votacao.dto.VotoContagem;
+import br.com.votacao.dto.request.AbrirSessaoRequest;
+import br.com.votacao.dto.response.PautaResponse;
+import br.com.votacao.dto.response.SessaoVotacaoResponse;
 import br.com.votacao.exception.BusinessException;
+import br.com.votacao.mapper.PautaMapper;
+import br.com.votacao.mapper.SessaoVotacaoMapper;
 import br.com.votacao.repository.PautaRepository;
-import br.com.votacao.repository.SessaoVotacaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,31 +19,35 @@ import java.time.LocalDateTime;
 @Service
 public class PautaService {
     private final PautaRepository pautaRepository;
-    private final SessaoVotacaoRepository sessaoRepository;
+    private final SessaoVotacaoService sessaoVotacaoService;
     private final VotacaoCacheService cacheService;
+    private final PautaMapper pautaMapper;
+    private final SessaoVotacaoMapper sessaoVotacaoMapper;
     private static final Logger log = LoggerFactory.getLogger(PautaService.class);
 
     public PautaService(PautaRepository pautaRepository,
-                        SessaoVotacaoRepository sessaoRepository, VotacaoCacheService cacheService) {
+                        SessaoVotacaoService sessaoVotacaoService, VotacaoCacheService cacheService, PautaMapper pautaMapper, SessaoVotacaoMapper sessaoVotacaoMapper) {
         this.pautaRepository = pautaRepository;
-        this.sessaoRepository = sessaoRepository;
+        this.sessaoVotacaoService = sessaoVotacaoService;
         this.cacheService = cacheService;
+        this.pautaMapper = pautaMapper;
+        this.sessaoVotacaoMapper = sessaoVotacaoMapper;
     }
 
-    public Pauta criarPauta(String titulo) {
+    public PautaResponse criarPauta(String titulo) {
         log.info("Criando a pauta para o título={}", titulo);
 
         Pauta pauta = new Pauta();
         pauta.setTitulo(titulo);
         Pauta pautaSalva = pautaRepository.save(pauta);
         log.info("Pauta criada para o título={}", titulo);
-        return pautaSalva;
+        return pautaMapper.toResponse(pautaSalva);
     }
 
-    public void abrirSessao(Long pautaId, Integer minutos) {
+    public SessaoVotacaoResponse abrirSessao(Long pautaId, AbrirSessaoRequest abrirSessaoRequest) {
         log.info("Abrindo sessão de votação para pautaId={}", pautaId);
 
-        Pauta pauta = pautaRepository.findById(pautaId)
+        Pauta pauta = pautaRepository.findPautaComSessaoAtiva(pautaId, LocalDateTime.now())
                 .orElseThrow(() -> {
                     log.warn("Pauta não encontrada. pautaId={}", pautaId);
                     return new BusinessException("Pauta não encontrada");
@@ -49,7 +58,7 @@ public class PautaService {
             throw new BusinessException("Sessão já aberta");
         }
 
-        int duracaoMinutos = minutos != null ? minutos : 1;
+        int duracaoMinutos = abrirSessaoRequest != null ? abrirSessaoRequest.getDuracaoEmMinutos() : 1;
         log.info("Sessão será aberta por {} minuto(s)", duracaoMinutos);
 
         SessaoVotacao sessao = new SessaoVotacao();
@@ -57,9 +66,17 @@ public class PautaService {
         sessao.setInicio(LocalDateTime.now());
         sessao.setFim(LocalDateTime.now().plusMinutes(duracaoMinutos));
 
-        SessaoVotacao sessaoSalva = sessaoRepository.save(sessao);
+        SessaoVotacao sessaoSalva = sessaoVotacaoService.save(sessao);
         log.info("Sessão criada com sucesso para pautaId={}", pautaId);
 
         cacheService.sinalizarSessaoAberta(pautaId, sessaoSalva.getId(), duracaoMinutos);
+
+        return sessaoVotacaoMapper.toResponse(sessaoSalva);
+    }
+
+    public VotoContagem votosContagem(Long pautaId){
+        log.info("Iniciando a contagem de votos no Pauta Service para pautaId={}", pautaId);
+
+        return pautaRepository.votosContagem(pautaId);
     }
 }

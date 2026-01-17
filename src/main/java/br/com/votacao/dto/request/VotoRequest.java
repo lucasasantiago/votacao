@@ -11,6 +11,11 @@ public class VotoRequest {
     @NotNull(message = "O voto é obrigatório.")
     private String voto;
 
+    public VotoRequest(String associadoId, String voto) {
+        this.associadoId = associadoId;
+        this.voto = voto;
+    }
+
     public String getAssociadoId() {
         return associadoId;
     }
@@ -25,5 +30,13 @@ public class VotoRequest {
 
     public void setVoto(String voto) {
         this.voto = voto;
+    }
+
+    @Override
+    public String toString() {
+        return "VotoRequest{" +
+                "associadoId='" + associadoId + '\'' +
+                ", voto='" + voto + '\'' +
+                '}';
     }
 }
