@@ -1,6 +1,5 @@
-version: '3.8'
-
 services:
+  # Banco de Dados
   postgres:
     image: postgres:16
     container_name: postgres-votacao
@@ -12,7 +11,10 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - votacao-network
 
+  # Mensageria
   rabbitmq:
     image: rabbitmq:3.12-management
     container_name: rabbitmq-votacao
@@ -22,6 +24,21 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - votacao-network
+
+  # Cache
+  redis:
+    image: redis:7-alpine
+    container_name: votacao-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - votacao-network
+
+networks:
+  votacao-network:
+    driver: bridge
 
 volumes:
   postgres_data:

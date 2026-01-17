@@ -38,3 +38,24 @@ http://localhost:8080
 
 ### Endpoint de health check
 GET /actuator/health
+
+## Relatório de Performance (Teste de Carga)
+
+Foi realizado um teste de carga utilizando **Apache JMeter** para validar o comportamento do sistema sob concorrência.
+
+### Cenário do Teste
+- **Volume**: 1.000 requisições (votos).
+- **Usuários Simultâneos**: 100 threads.
+- **Ramp-up**: 10 segundos.
+- **Payload**: Randomização de `associadoId` (UUID) e `voto` (SIM/NAO) via funções Groovy.
+
+### Resultados Obtidos
+| Métrica | Resultado |
+| :--- | :--- |
+| **Amostras (Samples)** | 1.000 |
+| **Tempo de Resposta Médio (Average)** | **14 ms** |
+| **Vazão (Throughput)** | 100.0/sec |
+| **Taxa de Erro** | 0.00% |
+
+#### Screenshot do Relatório (JMeter Summary Report)
+![Resultado JMeter](docs/images/jmeter_summary_report.png)

@@ -1,12 +1,10 @@
 package br.com.votacao.service;
 
-import br.com.votacao.domain.entity.Pauta;
-import br.com.votacao.domain.entity.SessaoVotacao;
-import br.com.votacao.domain.entity.Voto;
 import br.com.votacao.domain.enums.TipoVoto;
 import br.com.votacao.dto.response.ResultadoVotacaoResponse;
 import br.com.votacao.exception.BusinessException;
-import br.com.votacao.message.VotoProducer;
+import br.com.votacao.message.VotoMessage;
+import br.com.votacao.message.producer.VotoProducer;
 import br.com.votacao.repository.PautaRepository;
 import br.com.votacao.repository.SessaoVotacaoRepository;
 import br.com.votacao.repository.VotoRepository;
@@ -50,16 +48,8 @@ public class VotoService {
         }
 
         cacheService.registrarVotoNoCache(pautaId, associadoId);
-        votoProducer.enviarVoto(new VotoMensagem(pautaId, sessaoId, associadoId, voto));
+        votoProducer.enviarVoto(new VotoMessage(pautaId, sessaoId, associadoId, voto));
 
-        Pauta pauta = pautaRepository.getReferenceById(pautaId);
-
-        Voto novoVoto = new Voto();
-        novoVoto.setAssociadoId(associadoId);
-        novoVoto.setPauta(pauta);
-        novoVoto.setVoto(voto);
-
-        votoRepository.save(novoVoto);
         log.info("O voto do associado foi registrado com sucesso. pautaId={}, associadoId={}, voto={}", pautaId, associadoId, voto);
     }
 

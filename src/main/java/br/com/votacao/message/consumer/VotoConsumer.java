@@ -1,6 +1,7 @@
-package br.com.votacao.message;
+package br.com.votacao.message.consumer;
 
 import br.com.votacao.domain.entity.Voto;
+import br.com.votacao.message.VotoMessage;
 import br.com.votacao.repository.PautaRepository;
 import br.com.votacao.repository.VotoRepository;
 import jakarta.transaction.Transactional;
